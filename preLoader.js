@@ -4,102 +4,160 @@
     } else if (typeof exports === 'object') {
         module.exports = factory(root);
     } else {
-        root.PreLoader = factory(root); // @todo rename plugin
+        root.preLoader = factory(root);
     }
 })(typeof global !== "undefined" ? global : this.window || this.global, function (root) {
     'use strict';
 
-    var PreLoader = {}; // Object for public APIs
-    // In order not to loose reference to the created object and to avoid it's deletion
-    // by the garbage collector the new image is saved in the fetchedImages object
-    // Accessing the assets from memory is quicker than from dick cache
-    var fetchedImages = {};
+    var preLoader = {}; // Object for public APIs
+
+    preLoader.document = {};
+    preLoader.script = {};
+    preLoader.image = {};
+
     // feature testing
     var testLink = document.createElement('link');
-    var isRelListSupported = !!testLink.relList;
-    var preLoadLinkSupported = isRelListSupported && testLink.relList.supports('preload');
-    var preFetchLinkSupported = isRelListSupported && testLink.relList.supports('prefetch');
+    var preLoadLinkSupported = DOMTokenListSupports(testLink.relList, 'preload');
+    var preFetchLinkSupported = DOMTokenListSupports(testLink.relList, 'prefetch');
+    var preRenderLinkSupported = false; // due to a very vague browser support;
 
     /*****************************************************************************************/
 
-    function loadImageStrategy(url) {
-        var img = new Image();
-        img.src = url;
-        return img;
+    // util functions
+
+    /*****************************************************************************************/
+
+    function DOMTokenListSupports(tokenList, token) {
+        if (!tokenList || !tokenList.supports) {
+            return;
+        }
+        try {
+            return tokenList.supports(token);
+        } catch (e) {
+            if (e instanceof TypeError) {
+                console.log("The DOMTokenList doesn't have a supported tokens list");
+            } else {
+                console.error("That shouldn't have happened");
+            }
+        }
     }
 
-    function loadLinkStrategy(url) {
+    function createLinkTag(url, options) {
         var link = document.createElement('link');
-        link.rel = 'preload';
-        link.as = 'image';
-        link.href = url;
+        if (url) {
+            link.href = url;
+        } else {
+            return false;
+        }
+        if (options.rel) {
+            link.rel = options.rel;
+        }
+        if (options.as) {
+            link.as = options.as;
+        }
         document.head.appendChild(link);
-        return link
     }
 
-    function preLoad(args) {
-        var url, neverLoaded;
-        // choosing pre-loading strategy
+    function execute(func, args, options) {
+        if (document.readyState === 'complete') {
+            func(args, options);
+        } else {
+            addEventListener('load', func.bind(null, args, options));
+        }
+    }
+
+    /*****************************************************************************************/
+
+    // Preload
+
+    /*
+     * Preload is different from prefetch in that it focuses on current navigation
+     * and fetches resources with high-priority.
+     * Prefetch focuses on fetching resources for the next navigation which are low priority.
+     * It is also important to note that preload does not block the window’s onload event.
+     *
+     * Info taken from: https://www.keycdn.com/blog/resource-hints/
+     */
+
+    /*****************************************************************************************/
+
+    function preLoad(args, options) {
+        var url;
         if (preLoadLinkSupported) {
             for (var i = 0, j = args.length; i < j; i++) {
                 url = args[i];
-                loadLinkStrategy(url);
+                createLinkTag(url, options);
             }
         } else {
-            // setTimeout used to ensure pre-loading will happen after all the main assets are downloaded
-            // as much as possilbe
-            setTimeout(function () {
-                for (var i = 0, j = args.length; i < j; i++) {
-                    url = args[i];
-                    neverLoaded = fetchedImages[url] !== '' && !fetchedImages[url];
-                    if (neverLoaded) {
-                        fetchedImages[url] = (loadImageStrategy(url));
-                    }
-                }
-            }, 3000);
+            console.error('link preloading is not supported');
         }
     }
 
-    PreLoader.preLoad = function () {
+    preLoader.image.load = function () {
         var args = [].slice.call(arguments);
+        var options = {
+            rel: 'preload',
+            as: 'image'
+        };
+        execute(preLoad, args, options)
+    };
 
-        if (document.readyState === 'complete') {
-            preLoad(args);
-        } else {
-            addEventListener('load', preLoad.bind(null, args));
-        }
+    preLoader.script.load = function () {
+        var args = [].slice.call(arguments);
+        var options = {
+            rel: 'preload',
+            as: 'script'
+        };
+        execute(preLoad, args, options)
+    };
+
+    preLoader.document.load = function () {
+        var args = [].slice.call(arguments);
+        var options = {
+            rel: 'preload',
+            as: 'document'
+        };
+        execute(preLoad, args, options)
     };
 
     /*****************************************************************************************/
 
-    function preFetchLinkStrategy(url) {
-        var link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = url;
-        document.head.appendChild(link);
-    }
+    // Prefetch
 
-    function preFetch(args) {
+    /*
+    * Prefetch is a low priority resource hint that allows the browser to fetch resources
+    * in the background (idle time) that might be needed later,
+    * and store them in the browser’s cache
+    *
+    * Info taken from: https://www.keycdn.com/blog/resource-hints/
+    */
+
+    /*****************************************************************************************/
+
+    function preFetch(args, options) {
         var url;
         if (preFetchLinkSupported) {
             for (var i = 0, j = args.length; i < j; i++) {
                 url = args[i];
-                preFetchLinkStrategy(url);
+                createLinkTag(url, options);
             }
+        } else {
+            console.error('link prefetching is not supported');
         }
     }
 
-    PreLoader.preFetch = function () {
+    preLoader.document.fetch = function () {
         var args = [].slice.call(arguments);
-
-        if (document.readyState === 'complete') {
-            preFetch(args);
-        } else {
-            addEventListener('load', preFetch.bind(null, args));
-        }
+        var options = {
+            rel: 'prefetch',
+            as: 'document'
+        };
+        execute(preFetch, args, options);
     };
 
-    window.PreLoader = PreLoader;
+    /*****************************************************************************************/
 
-    return PreLoader;
+    window.preLoader = preLoader;
+
+    return preLoader;
 });
