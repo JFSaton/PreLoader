@@ -76,7 +76,7 @@
 
     function createFunc() {
         var args = slice.call(arguments);
-        execute(args[0], args[1], args[2]);
+        execute(args[0], slice.call(args[1]), args[2]);
     }
 
     /*****************************************************************************************/
@@ -95,11 +95,12 @@
     /*****************************************************************************************/
 
     /**
-     * @param urls {Array}
+     * @param urls [Array]
      * @param options {Object}
      * @private
      */
     function _preLoad(urls, options) {
+        options && (options.rel = 'preload');
         strategy(preLoadLinkSupported, urls, options, 'link preloading is not supported');
     }
 
@@ -118,11 +119,12 @@
     /*****************************************************************************************/
 
     /**
-     * @param urls {Array}
+     * @param urls [Array]
      * @param options {Object}
      * @private
      */
     function _preFetch(urls, options) {
+        options && (options.rel = 'prefetch');
         strategy(preFetchLinkSupported, urls, options, 'link prefetching is not supported');
     }
 
@@ -133,11 +135,12 @@
     /*****************************************************************************************/
 
     /**
-     * @param urls {Array}
+     * @param urls [Array]
      * @param options {Object}
      * @private
      */
     function _dnsPreFetch(urls, options) {
+        options && (options.rel = 'dns-prefetch');
         strategy(dnsPreFetchSupported, urls, options, 'link dns-prefetching is not supported');
     }
 
@@ -147,7 +150,13 @@
 
     /*****************************************************************************************/
 
+    /**
+     * @param urls [Array]
+     * @param options {Object}
+     * @private
+     */
     function _preConnect(urls, options) {
+        options && (options.rel = 'preconnect');
         strategy(preConnectSupported, urls, options, 'link preconnecting is not supported');
     }
 
@@ -162,17 +171,13 @@
         return {
             preFetch: function () {
                 createFunc(_preFetch, arguments, {
-                    rel: 'prefetch',
                     as: type
                 });
             },
             preLoad: function () {
-                var args = slice.call(arguments);
-                var options = {
-                    rel: 'preload',
+                createFunc(_preLoad, arguments, {
                     as: type
-                };
-                execute(_preLoad, args, options)
+                });
             }
         };
     }());
@@ -180,13 +185,15 @@
     preLoader.image = (function () {
         var type = 'image';
         return {
-            preLoad: function () {
-                var args = slice.call(arguments);
-                var options = {
-                    rel: 'preload',
+            preFetch: function () {
+                createFunc(_preFetch, arguments, {
                     as: type
-                };
-                execute(_preLoad, args, options)
+                });
+            },
+            preLoad: function () {
+                createFunc(_preLoad, arguments, {
+                    as: type
+                });
             }
         }
     }());
@@ -194,32 +201,25 @@
     preLoader.script = (function () {
         var type = 'script';
         return {
-            preLoad: function () {
-                var args = slice.call(arguments);
-                var options = {
-                    rel: 'preload',
+            preFetch: function () {
+                createFunc(_preFetch, arguments, {
                     as: type
-                };
-                execute(_preLoad, args, options)
+                });
+            },
+            preLoad: function () {
+                createFunc(_preLoad, arguments, {
+                    as: type
+                });
             }
         };
     }());
 
     preLoader.dnsPreFetch = function () {
-        var args = slice.call(arguments);
-        var options = {
-            rel: 'dns-prefetch'
-        };
-        execute(_dnsPreFetch, args, options);
+        createFunc(_dnsPreFetch, arguments, {});
     };
 
     preLoader.preConnect = function () {
-        var args = slice.call(arguments);
-        var options = {
-            rel: 'preconnect',
-            crossOrigin: true
-        };
-        execute(_preConnect, args, options);
+        createFunc(_preConnect, arguments, {});
     };
 
     /*****************************************************************************************/
