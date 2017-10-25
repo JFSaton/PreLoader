@@ -16,3 +16,18 @@ add the pre-loader as a property in the require.conf.js under "path":
 now it's ready to be used:
 var preLoader = require('pre-loader');
 preLoader.document.preFetch('https://what.ever.com');
+
+## API
+
+preLoader.document.preFetch
+preLoader.document.preLoad
+
+preLoader.image.preFetch
+preLoader.image.preLoad
+
+preLoader.script.preFetch
+preLoader.script.preLoad
+
+preLoader.dnsPreFetch
+
+preLoader.preConnect
