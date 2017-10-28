@@ -22,6 +22,12 @@
     // Create local references to array methods we'll want to use later.
     var slice = [].slice;
 
+    //Constants
+    var PRELOAD = 'preload';
+    var PREFETCH = 'prefetch';
+    var DNS_PREFETCH = 'dns-prefetch';
+    var PRE_CONNECT = 'preconnect';
+
     /*****************************************************************************************/
 
     // util functions
@@ -102,8 +108,8 @@
      * @private
      */
     function _preLoad(urls, options) {
-        options && (options.rel = 'preload');
-        strategy(preLoadLinkSupported, urls, options, 'link preloading is not supported');
+        options ? (options.rel = PRELOAD) : (options = {rel: PRELOAD});
+        strategy(preLoadLinkSupported, urls, options, 'link ' + PRELOAD + ' is not supported');
     }
 
     /*****************************************************************************************/
@@ -134,8 +140,8 @@
      * @private
      */
     function _preFetch(urls, options) {
-        options && (options.rel = 'prefetch');
-        strategy(preFetchLinkSupported, urls, options, 'link prefetching is not supported');
+        options ? (options.rel = PREFETCH) : (options = {rel: PREFETCH});
+        strategy(preFetchLinkSupported, urls, options, 'link ' + PREFETCH + ' is not supported');
     }
 
     /*****************************************************************************************/
@@ -150,8 +156,8 @@
      * @private
      */
     function _dnsPreFetch(urls, options) {
-        options && (options.rel = 'dns-prefetch');
-        strategy(dnsPreFetchSupported, urls, options, 'link dns-prefetching is not supported');
+        options ? (options.rel = DNS_PREFETCH) : (options = {rel: DNS_PREFETCH});
+        strategy(dnsPreFetchSupported, urls, options, 'link ' + DNS_PREFETCH + ' is not supported');
     }
 
     /*****************************************************************************************/
@@ -166,8 +172,8 @@
      * @private
      */
     function _preConnect(urls, options) {
-        options && (options.rel = 'preconnect');
-        strategy(preConnectSupported, urls, options, 'link preconnecting is not supported');
+        options ? (options.rel = PRE_CONNECT) : (options = {rel: PRE_CONNECT});
+        strategy(preConnectSupported, urls, options, 'link ' + PRE_CONNECT + ' is not supported');
     }
 
     /*****************************************************************************************/
