@@ -53,12 +53,14 @@
         document.head.appendChild(link);
     }
 
+    /**
+     * On place to slice the args
+     * @param func
+     * @param args
+     * @param options
+     */
     function execute(func, args, options) {
-        if (document.readyState === 'complete') {
-            func(args, options);
-        } else {
-            addEventListener('load', func.bind(null, args, options));
-        }
+        func(slice.call(args), options);
     }
 
     function strategy(featureTestResult, urls, options, errorMsg) {
@@ -74,11 +76,6 @@
         }
     }
 
-    function createFunc() {
-        var args = slice.call(arguments);
-        execute(args[0], slice.call(args[1]), args[2]);
-    }
-
     /*****************************************************************************************/
 
     // Preload
@@ -86,10 +83,10 @@
     /*
      * Preload is different from prefetch in that it focuses on current navigation
      * and fetches resources with high-priority.
-     * Prefetch focuses on fetching resources for the next navigation which are low priority.
      * It is also important to note that preload does not block the window’s onload event.
      *
-     * Info taken from: https://www.keycdn.com/blog/resource-hints/
+     * Resources:
+     * https://www.keycdn.com/blog/resource-hints/
      */
 
     /*****************************************************************************************/
@@ -113,7 +110,15 @@
     * in the background (idle time) that might be needed later,
     * and store them in the browser’s cache
     *
-    * Info taken from: https://www.keycdn.com/blog/resource-hints/
+    * Prefetch serves a slightly different use case — a future navigation by the user
+    * (e.g between views or pages) where fetched resources and requests need to persist across navigations.
+    * If Page A initiates a prefetch request for critical resources needed for Page B,
+    * the critical resource and navigation requests can be completed in parallel.
+    * If we used preload for this use case, it would be immediately cancelled on Page A’s unload.
+    *
+    * Resources:
+    * https://www.keycdn.com/blog/resource-hints/
+    * https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf
     */
 
     /*****************************************************************************************/
@@ -170,12 +175,12 @@
         var type = 'document';
         return {
             preFetch: function () {
-                createFunc(_preFetch, arguments, {
+                execute(_preFetch, arguments, {
                     as: type
                 });
             },
             preLoad: function () {
-                createFunc(_preLoad, arguments, {
+                execute(_preLoad, arguments, {
                     as: type
                 });
             }
@@ -186,12 +191,12 @@
         var type = 'image';
         return {
             preFetch: function () {
-                createFunc(_preFetch, arguments, {
+                execute(_preFetch, arguments, {
                     as: type
                 });
             },
             preLoad: function () {
-                createFunc(_preLoad, arguments, {
+                execute(_preLoad, arguments, {
                     as: type
                 });
             }
@@ -202,24 +207,42 @@
         var type = 'script';
         return {
             preFetch: function () {
-                createFunc(_preFetch, arguments, {
+                execute(_preFetch, arguments, {
                     as: type
                 });
             },
             preLoad: function () {
-                createFunc(_preLoad, arguments, {
+                execute(_preLoad, arguments, {
                     as: type
                 });
             }
         };
     }());
 
+    preLoader.font = (function () {
+        var type = 'font';
+        return {
+            preFetch: function () {
+                execute(_preFetch, arguments, {
+                    as: type,
+                    crossOrigin: 'anonymous'
+                });
+            },
+            preLoad: function () {
+                execute(_preLoad, arguments, {
+                    as: type,
+                    crossOrigin: 'anonymous'
+                });
+            }
+        };
+    }());
+
     preLoader.dnsPreFetch = function () {
-        createFunc(_dnsPreFetch, arguments, {});
+        execute(_dnsPreFetch, arguments, {});
     };
 
     preLoader.preConnect = function () {
-        createFunc(_preConnect, arguments, {});
+        execute(_preConnect, arguments, {});
     };
 
     /*****************************************************************************************/
