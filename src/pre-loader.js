@@ -93,6 +93,11 @@
      * Preload focuses on current navigation and fetches resources with high-priority.
      * It is also important to note that preload does not block the window’s onload event.
      *
+     * Preloaded resources using the "as" attribute will have the
+     * same resource priority as the type of resource they are requesting.
+     * Preloaded resources without an "as" will otherwise be requested with the same
+     * priority as async XHR (so High)
+     *
      * Resources:
      * https://www.keycdn.com/blog/resource-hints/
      */
@@ -239,7 +244,7 @@
             preLoad: function () {
                 execute(_preLoad, arguments, {
                     as: type,
-                    crossOrigin: 'anonymous'
+                    crossOrigin: 'anonymous' // Preloaded fonts without cross-origin will double fetch
                 });
             }
         };
