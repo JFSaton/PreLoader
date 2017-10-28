@@ -73,9 +73,8 @@
      * @param featureTestResult - bool
      * @param urls
      * @param options
-     * @param errorMsg
      */
-    function strategy(featureTestResult, urls, options, errorMsg) {
+    function strategy(featureTestResult, urls, options) {
         var url;
         if (featureTestResult) {
             for (var i = 0, j = urls.length; i < j; i++) {
@@ -83,8 +82,6 @@
                 options.href = url;
                 createLinkTag(options);
             }
-        } else {
-            console.error(errorMsg);
         }
     }
 
@@ -109,7 +106,7 @@
      */
     function _preLoad(urls, options) {
         options ? (options.rel = PRELOAD) : (options = {rel: PRELOAD});
-        strategy(preLoadLinkSupported, urls, options, 'link ' + PRELOAD + ' is not supported');
+        strategy(preLoadLinkSupported, urls, options);
     }
 
     /*****************************************************************************************/
@@ -141,7 +138,7 @@
      */
     function _preFetch(urls, options) {
         options ? (options.rel = PREFETCH) : (options = {rel: PREFETCH});
-        strategy(preFetchLinkSupported, urls, options, 'link ' + PREFETCH + ' is not supported');
+        strategy(preFetchLinkSupported, urls, options);
     }
 
     /*****************************************************************************************/
@@ -157,7 +154,7 @@
      */
     function _dnsPreFetch(urls, options) {
         options ? (options.rel = DNS_PREFETCH) : (options = {rel: DNS_PREFETCH});
-        strategy(dnsPreFetchSupported, urls, options, 'link ' + DNS_PREFETCH + ' is not supported');
+        strategy(dnsPreFetchSupported, urls, options);
     }
 
     /*****************************************************************************************/
@@ -173,7 +170,7 @@
      */
     function _preConnect(urls, options) {
         options ? (options.rel = PRE_CONNECT) : (options = {rel: PRE_CONNECT});
-        strategy(preConnectSupported, urls, options, 'link ' + PRE_CONNECT + ' is not supported');
+        strategy(preConnectSupported, urls, options);
     }
 
     /*****************************************************************************************/
