@@ -63,6 +63,12 @@
         func(slice.call(args), options);
     }
 
+    /**
+     * @param featureTestResult - bool
+     * @param urls
+     * @param options
+     * @param errorMsg
+     */
     function strategy(featureTestResult, urls, options, errorMsg) {
         var url;
         if (featureTestResult) {
@@ -81,8 +87,7 @@
     // Preload
 
     /*
-     * Preload is different from prefetch in that it focuses on current navigation
-     * and fetches resources with high-priority.
+     * Preload focuses on current navigation and fetches resources with high-priority.
      * It is also important to note that preload does not block the window’s onload event.
      *
      * Resources:
