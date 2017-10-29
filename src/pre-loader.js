@@ -60,13 +60,17 @@
     }
 
     /**
-     * On place to slice the args
+     * This function is mainly used to adjust the arguments
      * @param func
      * @param args
      * @param options
      */
     function execute(func, args, options) {
-        func(slice.call(args), options);
+        var param = slice.call(args)[0];
+        if (param.constructor === String) {
+            param = param.split(',');
+        }
+        func(param, options);
     }
 
     /**
@@ -244,7 +248,7 @@
             preLoad: function () {
                 execute(_preLoad, arguments, {
                     as: type,
-                    crossOrigin: 'anonymous' // Preloaded fonts without cross-origin will double fetch
+                    crossOrigin: 'anonymous' // Preloaded fonts without cross-origin will double fetched
                 });
             }
         };
