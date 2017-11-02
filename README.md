@@ -54,8 +54,8 @@ this requires a certain time and adds to the page loading process.
 
 ## Use Cases
 
-When a user opens a menu, buttons in the menu are links are external, running preLoader.document.preFetch on the
-exact urls of the menu will help to cut down the redirection when it actual happens.
+When a user opens a menu and for example buttons in the menu are external links, running preLoader.document.preFetch on the
+exact urls of the menu will help to cut down the redirection time when it actual happens.
 
 
 
