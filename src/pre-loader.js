@@ -1,3 +1,6 @@
+/**
+ * Created by Alex Bartfeld
+ */
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         define([], factory(root));
@@ -133,6 +136,8 @@
     * the critical resource and navigation requests can be completed in parallel.
     * If we used preload for this use case, it would be immediately cancelled on Page A’s unload.
     *
+    * When pre-fetching document the url supplied must be exactly as the url that will be used for the actual url
+    *
     * Resources:
     * https://www.keycdn.com/blog/resource-hints/
     * https://medium.com/reloading/preload-prefetch-and-priorities-in-chrome-776165961bbf
@@ -153,6 +158,13 @@
     /*****************************************************************************************/
 
     // DNS Prefetch
+
+    /**
+     * Dns resolution is a process of converting a domain/hostname to an ip address
+     * required to access a resource (this process is what converts a user friendly
+     * url like: http://qnimate.com to http://85.72.179.121 ); this requires a certain time
+     * and adds to the page loading process.
+     */
 
     /*****************************************************************************************/
 
@@ -193,11 +205,6 @@
         return {
             preFetch: function () {
                 execute(_preFetch, arguments, {
-                    as: type
-                });
-            },
-            preLoad: function () {
-                execute(_preLoad, arguments, {
                     as: type
                 });
             }
@@ -248,7 +255,7 @@
             preLoad: function () {
                 execute(_preLoad, arguments, {
                     as: type,
-                    crossOrigin: 'anonymous' // Preloaded fonts without cross-origin will double fetched
+                    crossOrigin: 'anonymous' // Preloaded fonts without cross-origin will be double fetched
                 });
             }
         };
