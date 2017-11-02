@@ -1,7 +1,7 @@
 # PreLoader
 
-PreLoader is a script that leverage browser native caipabilites to create resource hints.
-Current version of the API allows to load and cache asset types like: document, image, script, font.
+PreLoader is a script that leverage browser native capabilities to create resource hints.
+Current version of the API allows to work with asset types like: document, image, script, font.
 As well as to use dns-prefech and preconnect link attributes.
 
 ## Setting up is easy!
@@ -41,9 +41,10 @@ preLoader.preConnect
 
 ##General Data
 
-preload: focuses on current navigation and fetches resources with high-priority. (can not be done on type document)
+preload: Preloades the actual resource. Focuses on current navigation and fetches resources with high-priority.
+(can not be done as="document")
 
-prefetch: is a low priority resource hint that allows the browser to fetch resources in the background
+prefetch: It is a low priority resource hint that allows the browser to fetch resources in the background
 (idle time) that might be needed later.
 When pre-fetching document the url supplied must be exactly as the url that will be used for the actual url
 (Pre-fetching of only the domain will not give the wanted results)
