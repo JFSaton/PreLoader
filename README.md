@@ -6,12 +6,6 @@ As well as to use dns-prefech and preconnect link attributes.
 
 ## Setting up is easy!
 
-In the WPL projects add the following to bower.json:
-"pre-loader": "git@bitbucket.org:galacoraltelavivrd/preloader.git#{version}"
-The loaded script will be downloaded in to the components directory.
-add the pre-loader as a property in the require.conf.js under "path":
-'pre-loader': '../components/pre-loader/dist/pre-loader'
-now it's ready to be used:
 var preLoader = require('pre-loader');
 preLoader.document.preFetch('https://what.ever.com');
 
